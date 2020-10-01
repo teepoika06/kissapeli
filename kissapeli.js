@@ -11,6 +11,9 @@ let taustan_korkeus = 769;
 var kissalista = [];
 var kissa_ajastin;
 
+var elamia_jaljella = 9;
+var pelastetut_kissat = 0;
+
 function preload() {
   taustakuva = loadImage('https://igno.cc/opetus/kuvat/tausta.png')
   kissakuva = loadImage('https://igno.cc/opetus/kuvat/cat.png')
@@ -19,8 +22,6 @@ function preload() {
 function setup() {
   var canvas = createCanvas(taustan_leveys, taustan_korkeus);
   kissa = new Kissa();
-  luo_kissoja();
-  angleMode(DEGREES);
 }
 
 function draw() {
@@ -33,8 +34,36 @@ function draw() {
 
     if (kissa_olio.Y > taustan_korkeus) {
       kissalista.splice(monesko, 1);
+      elamia_jaljella -= 1;
+    }
+
+    if (kissa_olio.X > taustan_leveys){
+      kissalista.splice(monesko, 1);
+      pelastetut_kissat += 1;
     }
   })
+
+  textSize(40);
+  textAlign(LEFT, TOP);
+  text("Elämät: " + elamia_jaljella + " Pelastetut kissat " + pelastetut_kissat,5,5);
+  if (elamia_jaljella <= 0) gameOver();
+}
+
+function gameOver() {
+  noLoop();
+  textSize(80);
+  textAlign(CENTER);
+  text("Game Over", taustan_leveys / 2, taustan_korkeus / 2);
+}
+
+function aloitaPeli() {
+  kissalista = [];
+  elamia_jaljella = 9;
+  pelastetut_kissat = 0;
+  clearTimeout(kissa_ajastin);
+  loop();
+
+  luo_kissoja();
 }
 
 function luo_lautta() {
@@ -62,7 +91,7 @@ class Kissa {
     this.X += this.Xnopeus;
     this.Ynopeus += 0.05;
 
-    if (this.Y +this.korkeus > lautanY) {
+    if (this.Y + this.korkeus > lautanY) {
       if (this.X > mouseX && this.X< mouseX + lautan_leveys) {
         this.Ynopeus = -abs(this.Ynopeus);
       }
